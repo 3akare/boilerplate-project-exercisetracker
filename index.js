@@ -2,11 +2,18 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require("cors");
 
 // Initialize app
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(cors())
+app.use(express.static('public'))
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/views/index.html')
+});
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/exerciseTracker', {
@@ -56,10 +63,11 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
   await exercise.save();
   const user = await User.findById(req.params._id);
   res.json({
+    _id: user._id,
     username: user.username,
-    description: exercise.description,
-    duration: exercise.duration,
     date: exercise.date,
+    duration: exercise.duration,
+    description: exercise.description,
   });
 });
 
